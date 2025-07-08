@@ -1,33 +1,63 @@
-HELP.md
+### Java ###
+*.class
+*.jar
+*.war
+*.ear
+
+### Build ###
 target/
-.mvn/wrapper/maven-wrapper.jar
-!**/src/main/**/target/
-!**/src/test/**/target/
-
-### STS ###
-.apt_generated
-.classpath
-.factorypath
-.project
-.settings
-.springBeans
-.sts4-cache
-
-### IntelliJ IDEA ###
-.idea
-*.iws
-*.iml
-*.ipr
-
-### NetBeans ###
-/nbproject/private/
-/nbbuild/
-/dist/
-/nbdist/
-/.nb-gradle/
+bin/
+out/
 build/
-!**/src/main/**/build/
-!**/src/test/**/build/
+.gradle/
+
+### Maven ###
+.mvn/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+
+### Gradle ###
+!gradle/wrapper/gradle-wrapper.jar
+
+### Eclipse ###
+.project
+.classpath
+.settings/
+.springBeans
 
 ### VS Code ###
 .vscode/
+
+### Sistema Operativo ###
+.DS_Store
+Thumbs.db
+
+### Logs y temporales ###
+*.log
+*.out
+*.tmp
+*.swp
+*.bak
+logs/
+
+### Spring Boot Config / Entornos ###
+application*.yml
+application*.properties
+.env
+.env.*
+
+### Bases de datos locales ###
+*.h2.db
+*.mv.db
+*.db
+*.sqlite
+
+### Pruebas ###
+test-output/
+coverage/
+jacoco.exec
+generated/
