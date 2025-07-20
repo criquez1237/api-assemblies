@@ -1,6 +1,6 @@
 
 
-package com.assembliestore.api.module.user.services;
+package com.assembliestore.api.module.user.application.services;
 
 import org.springframework.stereotype.Service;
 
