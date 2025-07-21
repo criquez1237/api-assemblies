@@ -17,8 +17,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 @RestController
 @RequestMapping("/auth")
+@Tag(name = "Auth", description = "Endpoints de autenticación")
 public class AuthController {
 
     private final AuthPort _authPort;
@@ -33,6 +39,11 @@ public class AuthController {
     }
 
     @PostMapping("/signin")
+    @Operation(summary = "Iniciar sesión", description = "Permite a un usuario iniciar sesión en la aplicación")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Inicio de sesión exitoso"),
+            @ApiResponse(responseCode = "401", description = "Credenciales inválidas")
+    })
     public ResponseEntity<?> signin(@RequestBody final SignInRequest request) {
 
         JwtTokenDto jwtTokenDto = _authPort.authentication(SignInMapper.toSignAuthenticationCommand(request));
@@ -43,6 +54,11 @@ public class AuthController {
     }
 
     @PostMapping("/signup")
+    @Operation(summary = "Registrarse", description = "Permite a un nuevo usuario registrarse en la aplicación")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Registro exitoso"),
+            @ApiResponse(responseCode = "400", description = "Solicitud inválida")
+    })
     public ResponseEntity<?> signup(@RequestBody SignUpRequest request) {
 
         JwtTokenDto jwtTokenDto = _authPort.register(SignUpMapper.toRegisterCommand(request));
@@ -53,6 +69,11 @@ public class AuthController {
     }
 
     @PostMapping("/refresh")
+    @Operation(summary = "Actualizar token", description = "Permite a un usuario actualizar su token de acceso")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Token actualizado exitosamente"),
+            @ApiResponse(responseCode = "401", description = "Token de actualización inválido")
+    })
     public ResponseEntity<?> refreshToken(
         @RequestHeader("Authorization") String authorizationHeader
         ) {
@@ -72,6 +93,11 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
+    @Operation(summary = "Cerrar sesión", description = "Permite a un usuario cerrar sesión en la aplicación")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Cierre de sesión exitoso"),
+            @ApiResponse(responseCode = "401", description = "Token inválido")
+    })
     public ResponseEntity<?> logout(@RequestHeader(HttpHeaders.AUTHORIZATION) String authHeader) {
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {

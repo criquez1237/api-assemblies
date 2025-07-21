@@ -1,0 +1,26 @@
+meta {
+  name: saveCategory
+  type: http
+  seq: 1
+}
+
+post {
+  url: http://localhost:8081/api/categorie/save
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: eyJhbGciOiJIUzUxMiJ9.eyJqdGkiOiJjOTFmMGIxZS0zNmY1LTRmOWItYTE0YS0yZTVmZGUzZjNlZjUiLCJ1c2VyTmFtZSI6ImFsaWNlMDEiLCJzdWIiOiJhbGljZTAxQGV4YW1wbGUuY29tIiwiaWF0IjoxNzUzMDcwMjg5LCJleHAiOjE3NTMxNTY2ODl9.MS2J1ltrP0d6-VAdalDXxTi8TzArBPuBJR5LNytGou-b2weSb3vWYCzstRG65QLjhb8clPWKYCJSbUTpYXjeyw
+}
+
+body:json {
+  {
+    "name": "CategoriaTest1",
+    "description": "Categoria de prueba",
+    "imageUrl": null,
+    "subCategory": null,
+    "actived": true,
+    "visible": true
+  }
+}

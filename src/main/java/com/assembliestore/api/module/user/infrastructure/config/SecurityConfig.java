@@ -1,7 +1,5 @@
 package com.assembliestore.api.module.user.infrastructure.config;
 
-import java.security.Security;
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
