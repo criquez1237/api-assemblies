@@ -1,0 +1,41 @@
+meta {
+  name: Access Denied - Client Creating Product
+  type: http
+  seq: 14
+}
+
+post {
+  url: {{baseUrl}}/v1/products/upsert
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{clientToken}}
+}
+
+body:json {
+  {
+    "name": "Producto no autorizado",
+    "description": "Cliente intentando crear producto",
+    "specifications": [],
+    "brandName": "Test",
+    "price": 99.99,
+    "gallery": [],
+    "subCategoryId": "subcat123",
+    "stockQuantity": 1,
+    "actived": true,
+    "visible": true
+  }
+}
+
+tests {
+  test("Response status is 403 for unauthorized access", function() {
+    expect(res.getStatus()).to.equal(403);
+  });
+  
+  test("Access denied for client creating product", function() {
+    // El endpoint debe estar protegido con @PreAuthorize
+    // Solo ADMIN y MANAGEMENT pueden crear productos
+  });
+}

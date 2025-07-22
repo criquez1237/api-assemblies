@@ -1,0 +1,46 @@
+meta {
+  name: Price Precision Test
+  type: http
+  seq: 15
+}
+
+post {
+  url: {{baseUrl}}/v1/products/upsert
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{adminToken}}
+}
+
+body:json {
+  {
+    "name": "Producto Test Precio Precisión",
+    "description": "Prueba de precisión de precios con múltiples decimales",
+    "specifications": [],
+    "brandName": "Test Brand",
+    "price": 123.456789,
+    "gallery": [],
+    "subCategoryId": "subcat999",
+    "stockQuantity": 1,
+    "actived": true,
+    "visible": true
+  }
+}
+
+tests {
+  test("Response status is 200", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+  
+  test("Product created successfully", function() {
+    expect(res.getBody()).to.have.property('success');
+    expect(res.getBody().success).to.equal('true');
+    expect(res.getBody().message).to.contain('creado exitosamente');
+  });
+}
+
+vars:post-response {
+  precisionProductId: res.getBody().productId
+}

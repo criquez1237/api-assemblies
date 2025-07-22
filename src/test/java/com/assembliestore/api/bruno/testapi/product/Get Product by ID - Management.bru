@@ -1,0 +1,58 @@
+meta {
+  name: Get Product by ID - Management
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{baseUrl}}/v1/products/{{productId}}
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{managementToken}}
+}
+
+tests {
+  test("Response status is 200", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+  
+  test("Product data is filtered for management", function() {
+    const product = res.getBody();
+    expect(product).to.have.property('id');
+    expect(product).to.have.property('name');
+    expect(product).to.have.property('description');
+    expect(product).to.have.property('specifications');
+    expect(product).to.have.property('brandName');
+    expect(product).to.have.property('price');
+    expect(product).to.have.property('gallery');
+    expect(product).to.have.property('subCategoryId');
+    expect(product).to.have.property('stockQuantity');
+    expect(product).to.have.property('actived');
+    expect(product).to.have.property('visible');
+    expect(product).to.have.property('deleted');
+    expect(product).to.have.property('createdAt');
+    expect(product).to.have.property('updatedAt');
+    // Management no debe ver deletedAt si no está borrado
+  });
+  
+  test("Only non-deleted specifications are shown", function() {
+    const product = res.getBody();
+    if (product.specifications && product.specifications.length > 0) {
+      product.specifications.forEach(spec => {
+        expect(spec.deleted).to.be.false;
+      });
+    }
+  });
+  
+  test("Only non-deleted gallery items are shown", function() {
+    const product = res.getBody();
+    if (product.gallery && product.gallery.length > 0) {
+      product.gallery.forEach(img => {
+        expect(img.deleted).to.be.false;
+      });
+    }
+  });
+}

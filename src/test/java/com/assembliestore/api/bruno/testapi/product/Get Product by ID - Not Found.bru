@@ -1,0 +1,27 @@
+meta {
+  name: Get Product by ID - Not Found
+  type: http
+  seq: 13
+}
+
+get {
+  url: {{baseUrl}}/v1/products/nonexistent-id-12345
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{adminToken}}
+}
+
+tests {
+  test("Response status is 404 for non-existent product", function() {
+    expect(res.getStatus()).to.equal(404);
+  });
+  
+  test("Error message indicates product not found", function() {
+    expect(res.getBody()).to.have.property('success');
+    expect(res.getBody().success).to.equal('true');
+    expect(res.getBody().message).to.contain('Producto no encontrado');
+  });
+}

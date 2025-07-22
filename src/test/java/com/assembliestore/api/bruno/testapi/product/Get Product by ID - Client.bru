@@ -1,0 +1,64 @@
+meta {
+  name: Get Product by ID - Client
+  type: http
+  seq: 6
+}
+
+get {
+  url: {{baseUrl}}/v1/products/{{productId}}
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{clientToken}}
+}
+
+tests {
+  test("Response status is 200", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+  
+  test("Product data is minimal for client", function() {
+    const product = res.getBody();
+    expect(product).to.have.property('id');
+    expect(product).to.have.property('name');
+    expect(product).to.have.property('description');
+    expect(product).to.have.property('specifications');
+    expect(product).to.have.property('brandName');
+    expect(product).to.have.property('price');
+    expect(product).to.have.property('gallery');
+    
+    // Client no debe ver datos internos
+    expect(product).to.not.have.property('subCategoryId');
+    expect(product).to.not.have.property('stockQuantity');
+    expect(product).to.not.have.property('actived');
+    expect(product).to.not.have.property('visible');
+    expect(product).to.not.have.property('deleted');
+    expect(product).to.not.have.property('createdAt');
+    expect(product).to.not.have.property('updatedAt');
+    expect(product).to.not.have.property('deletedAt');
+  });
+  
+  test("Only visible and active specifications are shown", function() {
+    const product = res.getBody();
+    if (product.specifications && product.specifications.length > 0) {
+      product.specifications.forEach(spec => {
+        expect(spec.visible).to.be.true;
+        expect(spec.actived).to.be.true;
+        expect(spec.deleted).to.be.false;
+      });
+    }
+  });
+  
+  test("Only visible and active gallery items are shown", function() {
+    const product = res.getBody();
+    if (product.gallery && product.gallery.length > 0) {
+      product.gallery.forEach(img => {
+        expect(img.visible).to.be.true;
+        expect(img.actived).to.be.true;
+        expect(img.deleted).to.be.false;
+      });
+    }
+  });
+}

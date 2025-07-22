@@ -1,0 +1,77 @@
+meta {
+  name: Create Product
+  type: http
+  seq: 1
+}
+
+post {
+  url: http://localhost:8081/api/v1/products/upsert
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: eyJhbGciOiJIUzUxMiJ9.eyJqdGkiOiJjOTFmMGIxZS0zNmY1LTRmOWItYTE0YS0yZTVmZGUzZjNlZjUiLCJ1c2VyTmFtZSI6ImFsaWNlMDEiLCJzdWIiOiJhbGljZTAxQGV4YW1wbGUuY29tIiwiaWF0IjoxNzUzMTQ2MzI0LCJleHAiOjE3NTMyMzI3MjR9.2u3JFGxr3obdIXI-yMskDJ2LM9Z_r2sgjK8b2nAfxiZwH43f9wH1v1UY3GfQLxr-vIsdM0Rg_ySro2GLNYl_5w
+}
+
+body:json {
+  {
+    "name": "iPhone 15 Pro Max",
+    "description": "El smartphone más avanzado de Apple con tecnología ProRAW y cámara triple",
+    "specifications": [
+      {
+        "id": "spec1",
+        "name": "Pantalla",
+        "value": "6.7 pulgadas Super Retina XDR",
+        "visible": true,
+        "actived": true,
+        "deleted": false,
+        "createdAt": "2025-01-21T10:00:00.000Z",
+        "updatedAt": "2025-01-21T10:00:00.000Z",
+        "deletedAt": null
+      },
+      {
+        "id": "spec2",
+        "name": "Procesador",
+        "value": "A17 Pro Bionic",
+        "visible": true,
+        "actived": true,
+        "deleted": false,
+        "createdAt": "2025-01-21T10:00:00.000Z",
+        "updatedAt": "2025-01-21T10:00:00.000Z",
+        "deletedAt": null
+      }
+    ],
+    "brandName": "Apple",
+    "price": 1299.99,
+    "gallery": [
+      {
+        "id": "img1",
+        "imageUrl": "https://example.com/iphone15pro-front.jpg",
+        "description": "Vista frontal iPhone 15 Pro Max",
+        "visible": true,
+        "actived": true,
+        "deleted": false,
+        "createdAt": "2025-01-21T10:00:00.000Z",
+        "updatedAt": "2025-01-21T10:00:00.000Z",
+        "deletedAt": null
+      }
+    ],
+    "subCategoryId": "subcat123",
+    "stockQuantity": 50,
+    "actived": true,
+    "visible": true
+  }
+}
+
+tests {
+  test("Response status is 200", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+  
+  test("Response has success message", function() {
+    expect(res.getBody()).to.have.property('success');
+    expect(res.getBody().success).to.equal('true');
+    expect(res.getBody().message).to.contain('creado exitosamente');
+  });
+}

@@ -1,0 +1,19 @@
+package com.assembliestore.api.module.product.domain.entity;
+
+import com.google.cloud.firestore.annotation.ServerTimestamp;
+import java.util.Date;
+
+public record Gallery(
+
+    String id,
+    String imageUrl,
+    String description,
+    boolean visible,
+    boolean actived,
+    boolean deleted,
+    @ServerTimestamp Date createdAt,
+    @ServerTimestamp Date updatedAt,
+    Date deletedAt
+) {
+
+}

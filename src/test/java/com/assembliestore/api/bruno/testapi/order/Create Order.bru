@@ -1,0 +1,62 @@
+meta {
+  name: Create Order
+  type: http
+  seq: 1
+}
+
+post {
+  url: http://localhost:8081/api/orders
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: eyJhbGciOiJIUzUxMiJ9.eyJqdGkiOiJmNDA1Zjg4NC0yMjY3LTRiZjQtODFhYi0wYTRjMjU4YjYwZmYiLCJ1c2VyTmFtZSI6ImVranJpY25yaXUiLCJzdWIiOiJ0ZXN0MTRqQGV4YW1wbGUuY29tIiwiaWF0IjoxNzUzMjExMjM5LCJleHAiOjE3NTMyOTc2Mzl9.mQCmCG7-vL_KU5_5ioJQr9YQjg2_V9XddB6aofQWtKYJdV77EUt33lsrT-KR8MwcTbJAU8CERYRYOSkp1ap0Eg
+}
+
+body:json {
+  {
+    "products": [
+      {
+        "productId": "ca217548-f3fb-426e-b8dc-740700b2c1d1",
+        "name": "iPhone 15 Pro",
+        "unitPrice": 1200.00,
+        "quantity": 1
+      },
+      {
+        "productId": "ca217548-f3fb-426e-b8dc-740700b2c1d1", 
+        "name": "MacBook Pro",
+        "unitPrice": 2500.00,
+        "quantity": 1
+      }
+    ],
+    "shippingAddress": {
+      "street": "123 Main Street",
+      "city": "New York",
+      "country": "USA",
+      "postalCode": "10001"
+    },
+    "paymentMethod": "CREDIT_CARD"
+  }
+}
+
+tests {
+  test("Response status is 201", function() {
+    expect(res.getStatus()).to.equal(201);
+  });
+  
+  test("Response has success message", function() {
+    expect(res.getBody().success).to.equal(true);
+    expect(res.getBody().message).to.equal("Order created successfully");
+  });
+  
+  test("Response has order data", function() {
+    expect(res.getBody().data.order).to.be.an('object');
+    expect(res.getBody().data.order.id).to.be.a('string');
+    expect(res.getBody().data.order.total).to.equal(3700.00);
+  });
+  
+  test("Response has clientSecret for payment", function() {
+    expect(res.getBody().data.clientSecret).to.be.a('string');
+  });
+}

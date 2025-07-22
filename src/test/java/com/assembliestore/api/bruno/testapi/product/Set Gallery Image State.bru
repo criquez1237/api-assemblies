@@ -1,0 +1,32 @@
+meta {
+  name: Set Gallery Image State
+  type: http
+  seq: 3
+}
+
+patch {
+  url: http://localhost:8081/api/products/a791f32c-a6a5-45ad-b3d5-3b97e2bdbc81/gallery/img2/state
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: <YOUR_JWT_TOKEN>
+}
+
+body:json {
+  {
+    "visible": false,
+    "actived": true,
+    "deleted": false
+  }
+}
+
+tests {
+  test("Response status is 200", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+  test("Response has success message", function() {
+    expect(res.getBody().message).to.contain("Estado de la imagen actualizado");
+  });
+}
