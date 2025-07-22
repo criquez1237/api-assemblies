@@ -2,6 +2,9 @@ package com.assembliestore.api.module.user.infrastructure.adapter.in.api.control
 
 import com.assembliestore.api.module.user.infrastructure.adapter.dto.SignInRequest;
 import com.assembliestore.api.module.user.infrastructure.adapter.dto.SignUpRequest;
+import com.assembliestore.api.module.user.infrastructure.adapter.dto.SignUpResponse;
+import com.assembliestore.api.module.user.infrastructure.adapter.dto.VerifyOTPRequest;
+import com.assembliestore.api.module.user.infrastructure.adapter.dto.VerifyOTPResponse;
 import com.assembliestore.api.module.user.infrastructure.adapter.dto.TokenResponse;
 import com.assembliestore.api.module.user.infrastructure.adapter.mapper.SignInMapper;
 import com.assembliestore.api.module.user.infrastructure.adapter.mapper.SignUpMapper;
@@ -54,18 +57,44 @@ public class AuthController {
     }
 
     @PostMapping("/signup")
-    @Operation(summary = "Registrarse", description = "Permite a un nuevo usuario registrarse en la aplicación")
+    @Operation(summary = "Registrarse", description = "Registra un nuevo usuario y envía código OTP para activación")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Registro exitoso"),
+            @ApiResponse(responseCode = "201", description = "Registro exitoso - Se envió código OTP"),
             @ApiResponse(responseCode = "400", description = "Solicitud inválida")
     })
     public ResponseEntity<?> signup(@RequestBody SignUpRequest request) {
+        try {
+            // El método registerWithOTP no devuelve tokens, solo registra y envía OTP
+            _authPort.registerWithOTP(SignUpMapper.toRegisterCommand(request));
 
-        JwtTokenDto jwtTokenDto = _authPort.register(SignUpMapper.toRegisterCommand(request));
+            SignUpResponse response = SignUpResponse.success(request.getEmail());
+            return new ResponseEntity<>(response, HttpStatus.CREATED);
 
-        TokenResponse tokenResponse = SignUpMapper.toTokenResponse(jwtTokenDto);
+        } catch (Exception e) {
+            SignUpResponse response = SignUpResponse.error("Error en el registro: " + e.getMessage());
+            return ResponseEntity.badRequest().body(response);
+        }
+    }
 
-        return new ResponseEntity<>(tokenResponse, HttpStatus.CREATED);
+    @PostMapping("/verify-otp")
+    @Operation(summary = "Verificar OTP", description = "Verifica el código OTP y activa la cuenta del usuario")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OTP verificado - Cuenta activada"),
+            @ApiResponse(responseCode = "400", description = "Código OTP inválido o expirado")
+    })
+    public ResponseEntity<?> verifyOTP(@RequestBody VerifyOTPRequest request) {
+        try {
+            JwtTokenDto jwtTokenDto = _authPort.verifyOTPAndActivate(request.getEmail(), request.getOtpCode());
+            
+            TokenResponse tokenResponse = SignUpMapper.toTokenResponse(jwtTokenDto);
+            VerifyOTPResponse response = VerifyOTPResponse.success(tokenResponse);
+            
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            VerifyOTPResponse response = VerifyOTPResponse.error("Error al verificar OTP: " + e.getMessage());
+            return ResponseEntity.badRequest().body(response);
+        }
     }
 
     @PostMapping("/refresh")

@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Código de Verificación - {{companyName}}</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            padding: 20px;
+        }
+        .header {
+            text-align: center;
+            background-color: #9b59b6;
+            color: white;
+            padding: 30px 20px;
+            border-radius: 8px 8px 0 0;
+        }
+        .content {
+            padding: 30px 20px;
+            line-height: 1.6;
+            text-align: center;
+        }
+        .otp-container {
+            background-color: #f8f9fa;
+            border: 2px dashed #9b59b6;
+            border-radius: 12px;
+            padding: 30px;
+            margin: 30px 0;
+        }
+        .otp-code {
+            font-size: 36px;
+            font-weight: bold;
+            color: #9b59b6;
+            letter-spacing: 8px;
+            margin: 20px 0;
+            font-family: 'Courier New', monospace;
+        }
+        .security-info {
+            background-color: #fff3f3;
+            border-left: 4px solid #e74c3c;
+            padding: 15px;
+            margin: 20px 0;
+            text-align: left;
+        }
+        .expiration-warning {
+            background-color: #fff8dc;
+            border: 1px solid #ffa500;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px 0;
+            color: #cc7a00;
+        }
+        .footer {
+            text-align: center;
+            padding: 20px;
+            background-color: #ecf0f1;
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+        .security-icon {
+            font-size: 48px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="security-icon">🔐</div>
+            <h1>Código de Verificación</h1>
+            <p>Tu código de seguridad</p>
+        </div>
+        
+        <div class="content">
+            <p>Hola <strong>{{userName}}</strong>,</p>
+            
+            <p>Has solicitado un código de verificación para tu cuenta. Usa el siguiente código para completar el proceso de verificación:</p>
+            
+            <div class="otp-container">
+                <h2>Tu Código de Verificación:</h2>
+                <div class="otp-code">{{otpCode}}</div>
+                <p>Ingresa este código en la aplicación para continuar</p>
+            </div>
+            
+            <div class="expiration-warning">
+                <h4>⏰ Importante: Código Temporal</h4>
+                <p>Este código es válido por <strong>{{expirationMinutes}} minutos</strong> solamente. Si no lo usas en este tiempo, tendrás que solicitar uno nuevo.</p>
+            </div>
+            
+            <div class="security-info">
+                <h4>🛡️ Medidas de Seguridad</h4>
+                <ul style="text-align: left;">
+                    <li>Nunca compartas este código con nadie</li>
+                    <li>{{companyName}} nunca te pedirá este código por teléfono o email</li>
+                    <li>Si no solicitaste este código, ignora este email</li>
+                    <li>Este código solo funciona una vez</li>
+                </ul>
+            </div>
+            
+            <p>Si no solicitaste este código de verificación, puedes ignorar este email de forma segura. Tu cuenta permanece protegida.</p>
+            
+            <p>Si tienes problemas o preguntas, contáctanos inmediatamente.</p>
+            
+            <p><strong>El equipo de {{companyName}}</strong></p>
+        </div>
+        
+        <div class="footer">
+            <p>Este email fue enviado a tu dirección registrada</p>
+            <p>&copy; 2024 {{companyName}}. Todos los derechos reservados.</p>
+            <p><strong>No respondas a este email.</strong> Este buzón no es monitoreado.</p>
+        </div>
+    </div>
+</body>
+</html>

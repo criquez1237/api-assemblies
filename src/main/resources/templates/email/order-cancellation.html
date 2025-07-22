@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orden Cancelada - {{orderId}}</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            padding: 20px;
+        }
+        .header {
+            text-align: center;
+            background-color: #e74c3c;
+            color: white;
+            padding: 30px 20px;
+            border-radius: 8px 8px 0 0;
+        }
+        .content {
+            padding: 30px 20px;
+            line-height: 1.6;
+        }
+        .order-info {
+            background-color: #fff3f3;
+            border-left: 4px solid #e74c3c;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        .refund-info {
+            background-color: #f0f8f0;
+            border: 1px solid #27ae60;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .refund-icon {
+            color: #27ae60;
+            font-size: 24px;
+            margin-right: 10px;
+        }
+        .important-note {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        .cta-button {
+            display: inline-block;
+            background-color: #3498db;
+            color: white;
+            padding: 12px 30px;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 20px 0;
+            font-weight: bold;
+        }
+        .footer {
+            text-align: center;
+            padding: 20px;
+            background-color: #ecf0f1;
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+        .sad-emoji {
+            font-size: 48px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="sad-emoji">😔</div>
+            <h1>Orden Cancelada</h1>
+            <p>Lamentamos que hayas cancelado tu orden</p>
+        </div>
+        
+        <div class="content">
+            <p>Hola <strong>{{userName}}</strong>,</p>
+            
+            <p>Lamentamos informarte que tu orden ha sido cancelada exitosamente. Entendemos que a veces las circunstancias cambian y esperamos poder servirte mejor en el futuro.</p>
+            
+            <div class="order-info">
+                <h3>📦 Información de la Orden Cancelada</h3>
+                <p><strong>Número de Orden:</strong> {{orderId}}</p>
+                <p><strong>Estado:</strong> Cancelada</p>
+                <p><strong>Fecha de Cancelación:</strong> {{currentDate}}</p>
+            </div>
+            
+            <div class="refund-info">
+                <h3><span class="refund-icon">💰</span>Información del Reembolso</h3>
+                <p>¡Buenas noticias! Tu dinero será reembolsado según el método de pago utilizado:</p>
+                
+                <ul>
+                    <li><strong>Tarjeta de Crédito/Débito:</strong> El reembolso aparecerá en tu estado de cuenta en 3-5 días hábiles</li>
+                    <li><strong>PayPal:</strong> El reembolso se procesará inmediatamente</li>
+                    <li><strong>Transferencia Bancaria:</strong> El reembolso se procesará en 2-3 días hábiles</li>
+                </ul>
+                
+                <p><strong>Método de pago original:</strong> {{refundMethod}}</p>
+            </div>
+            
+            <div class="important-note">
+                <h4>⚠️ Nota Importante</h4>
+                <p>El tiempo de reembolso puede variar dependiendo de tu banco o proveedor de servicios financieros. Si no ves el reembolso en el tiempo estimado, por favor contacta a tu banco o contáctanos.</p>
+            </div>
+            
+            <p>Esperamos verte de vuelta pronto. ¡Tenemos muchos productos increíbles esperándote!</p>
+            
+            <div style="text-align: center;">
+                <a href="https://assembliesstore.com/products" class="cta-button">Explorar Productos</a>
+            </div>
+            
+            <p>Si tienes alguna pregunta sobre tu cancelación o reembolso, no dudes en contactarnos en <a href="mailto:{{supportEmail}}">{{supportEmail}}</a>.</p>
+            
+            <p>Gracias por tu comprensión.</p>
+            <p><strong>El equipo de {{companyName}}</strong></p>
+        </div>
+        
+        <div class="footer">
+            <p>Este email fue enviado a {{userEmail}}</p>
+            <p>&copy; 2024 {{companyName}}. Todos los derechos reservados.</p>
+            <p>Si necesitas ayuda, contáctanos en {{supportEmail}}</p>
+        </div>
+    </div>
+</body>
+</html>

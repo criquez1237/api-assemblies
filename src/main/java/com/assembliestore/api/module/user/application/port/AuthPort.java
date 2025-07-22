@@ -10,6 +10,10 @@ public interface AuthPort {
     
     JwtTokenDto register(RegisterCommand command);
 
+    JwtTokenDto registerWithOTP(RegisterCommand command);
+
+    JwtTokenDto verifyOTPAndActivate(String email, String otpCode);
+
     JwtTokenDto refreshToken(String refreshToken);
 
     JwtTokenDto logout(String token);

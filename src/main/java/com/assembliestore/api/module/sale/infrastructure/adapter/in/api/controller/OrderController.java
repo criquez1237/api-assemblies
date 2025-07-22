@@ -145,6 +145,24 @@ public class OrderController {
         }
     }
 
+    @PatchMapping("/{id}/cancel")
+    @PreAuthorize("hasRole('CLIENT') or hasRole('ADMIN') or hasRole('MANAGEMENT')")
+    public ResponseEntity<ApiResponse<OrderResponseDto>> cancelOrder(
+            @Parameter(description = "ID de la orden") @PathVariable String id,
+            HttpServletRequest request) {
+        
+        try {
+            String userId = getUserIdFromToken(request);
+            Order cancelledOrder = orderService.cancelOrder(id, userId);
+            OrderResponseDto response = orderMapper.toResponseDto(cancelledOrder);
+            
+            return ResponseEntity.ok(ApiResponse.success("Orden cancelada exitosamente", response));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest()
+                    .body(ApiResponse.error("Error al cancelar la orden: " + e.getMessage()));
+        }
+    }
+
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<Void>> deleteOrder(

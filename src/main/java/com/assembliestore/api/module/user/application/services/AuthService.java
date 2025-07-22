@@ -1,9 +1,12 @@
 package com.assembliestore.api.module.user.application.services;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
-import org.springframework.boot.autoconfigure.security.oauth2.resource.OAuth2ResourceServerProperties.Jwt;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -22,9 +25,14 @@ import com.assembliestore.api.module.user.domain.entities.User;
 import com.assembliestore.api.module.user.domain.port.JwtPort;
 import com.assembliestore.api.module.user.domain.repository.TokenRepository;
 import com.assembliestore.api.module.user.domain.repository.UserRepository;
+import com.assembliestore.api.module.user.application.services.OTPService;
+import com.assembliestore.api.service.email.EmailService;
+import com.assembliestore.api.service.email.dto.EmailRequest;
 
 @Service
 public class AuthService implements AuthPort {
+
+    private static final Logger logger = LoggerFactory.getLogger(AuthService.class);
 
     private final PasswordEncoder passwordEncoder;
     private final UserRepository _userRepository;
@@ -32,6 +40,8 @@ public class AuthService implements AuthPort {
     private final AuthenticationManager _authenticationManager;
     private final TokenRepository _tokenRepository;
     private final JwtPort _jwtPort;
+    private final EmailService _emailService;
+    private final OTPService _otpService;
 
     public AuthService(
             UserRepository userRepository,
@@ -39,7 +49,9 @@ public class AuthService implements AuthPort {
             JwtTokenService tokenService,
             AuthenticationManager authenticationManager,
             JwtPort jwtPort,
-            TokenRepository tokenRepository
+            TokenRepository tokenRepository,
+            EmailService emailService,
+            OTPService otpService
             ) {
 
         this._userRepository = userRepository;
@@ -48,6 +60,8 @@ public class AuthService implements AuthPort {
         this._authenticationManager = authenticationManager;
         this._jwtPort = jwtPort;
         this._tokenRepository = tokenRepository;
+        this._emailService = emailService;
+        this._otpService = otpService;
     }
 
     @Override
@@ -72,7 +86,73 @@ public class AuthService implements AuthPort {
 
         this._userRepository.create(user);
 
+        // Generar y enviar OTP en lugar de tokens
+        String userName = user.getPerfil().getNames() + " " + user.getPerfil().getSurnames();
+        _otpService.generateAndSendOTP(user.getId(), user.getEmail(), userName);
+
+        // No generar tokens aquí, se generarán después de la verificación OTP
+        // return null para indicar que el registro requiere verificación OTP
+        return null;
+    }
+
+    public JwtTokenDto registerWithOTP(RegisterCommand command) {
+        if (this._userRepository.findByEmail(command.email()).isPresent()) {
+            throw new EmailAlreadyExistsException("El correo ya está registrado");
+        }
+
+        User user = new User();
+        user.setId(UUID.randomUUID().toString());
+        user.setUserName("ekjricnriu");
+        user.setEmail(command.email());
+        user.setPassword(passwordEncoder.encode(command.password()));
+        user.setRole(com.assembliestore.api.module.user.common.enums.Role.CLIENT);
+        user.setActived(false); // Usuario inactivo hasta verificar OTP
+        
+        Perfil perfil = new Perfil();
+        perfil.setNames(command.names());
+        perfil.setSurnames(command.surnames());
+        perfil.setImagePerfil(command.imagePerfil());
+        perfil.setPhone(command.phone());
+        user.setPerfil(perfil);
+
+        this._userRepository.create(user);
+
+        // Generar y enviar OTP
+        String userName = user.getPerfil().getNames() + " " + user.getPerfil().getSurnames();
+        _otpService.generateAndSendOTP(user.getId(), user.getEmail(), userName);
+
+        return null; // No se devuelven tokens hasta verificar OTP
+    }
+
+    public JwtTokenDto verifyOTPAndActivate(String email, String otpCode) {
+        // Verificar el código OTP
+        boolean isValidOTP = _otpService.verifyOTP(email, otpCode);
+        if (!isValidOTP) {
+            throw new RuntimeException("Código OTP inválido o expirado");
+        }
+
+        // Buscar el usuario por email
+        Optional<User> userOpt = _userRepository.findByEmail(email);
+        if (!userOpt.isPresent()) {
+            throw new RuntimeException("Usuario no encontrado");
+        }
+
+        User user = userOpt.get();
+        
+        // Activar la cuenta
+        user.setActived(true);
+        _userRepository.update(user);
+
+        // Generar tokens JWT
         JwtTokenDto tokens = _tokenService.generateToken(user);
+
+        // Enviar email de bienvenida ahora que la cuenta está activada
+        try {
+            sendWelcomeEmail(user);
+        } catch (Exception e) {
+            logger.warn("No se pudo enviar el email de bienvenida para el usuario: {}. Error: {}", 
+                       user.getEmail(), e.getMessage());
+        }
 
         return tokens;
     }
@@ -182,6 +262,26 @@ public class AuthService implements AuthPort {
         _tokenService.updateToken(updatedToken);
 
         return updatedToken;
+    }
+
+    private void sendWelcomeEmail(User user) {
+        try {
+            Map<String, Object> variables = new HashMap<>();
+            variables.put("userName", user.getPerfil().getNames() + " " + user.getPerfil().getSurnames());
+
+            EmailRequest emailRequest = new EmailRequest();
+            emailRequest.setTo(user.getEmail());
+            emailRequest.setSubject("¡Bienvenido a Assemblies Store!");
+            emailRequest.setTemplateName("welcome");
+            emailRequest.setVariables(variables);
+
+            _emailService.sendEmail(emailRequest);
+            
+            logger.info("Email de bienvenida enviado exitosamente a: {}", user.getEmail());
+        } catch (Exception e) {
+            logger.error("Error al enviar email de bienvenida a {}: {}", user.getEmail(), e.getMessage());
+            throw e;
+        }
     }
     
 }

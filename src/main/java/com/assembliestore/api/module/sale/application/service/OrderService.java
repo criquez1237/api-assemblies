@@ -9,6 +9,12 @@ import com.assembliestore.api.module.payment.domain.port.PaymentPort;
 import com.assembliestore.api.module.sale.domain.entity.PaymentMethod;
 import com.assembliestore.api.module.payment.domain.entity.PaymentRequest;
 import com.assembliestore.api.module.product.domain.port.StockPort;
+import com.assembliestore.api.module.user.domain.repository.UserRepository;
+import com.assembliestore.api.module.user.domain.entities.User;
+import com.assembliestore.api.service.email.EmailService;
+import com.assembliestore.api.service.email.dto.EmailRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +27,8 @@ import java.util.UUID;
 @Service
 public class OrderService {
 
+    private static final Logger logger = LoggerFactory.getLogger(OrderService.class);
+
     @Autowired
     private OrderPort orderPort;
 
@@ -29,6 +37,12 @@ public class OrderService {
     
     @Autowired
     private StockPort stockPort;
+
+    @Autowired
+    private EmailService emailService;
+
+    @Autowired
+    private UserRepository userRepository;
 
     public OrderPaymentResponse createOrder(Order order) {
         // Generate UUID if not present
@@ -205,6 +219,93 @@ public class OrderService {
                 throw new RuntimeException("Cannot change status of an order in " + currentStatus.getValue());
             default:
                 throw new RuntimeException("Unrecognized current status: " + currentStatus);
+        }
+    }
+
+    public Order cancelOrder(String orderId, String userId) {
+        // Buscar la orden
+        Optional<Order> orderOpt = orderPort.findOrderById(orderId);
+        if (!orderOpt.isPresent()) {
+            throw new RuntimeException("Orden no encontrada");
+        }
+        
+        Order order = orderOpt.get();
+        
+        // Verificar que la orden pertenezca al usuario (si no es admin)
+        if (!order.getUserId().equals(userId)) {
+            throw new RuntimeException("No tienes permisos para cancelar esta orden");
+        }
+        
+        // Verificar que la orden se pueda cancelar
+        if (!canBeCancelled(order.getStatus())) {
+            throw new RuntimeException("La orden no puede ser cancelada en su estado actual: " + order.getStatus().getValue());
+        }
+        
+        // Restaurar stock si la orden había reducido stock
+        if (order.getStatus() == OrderStatus.PROCESSING || order.getStatus() == OrderStatus.CONFIRMED || order.getStatus() == OrderStatus.PREPARING) {
+            if (order.getProducts() != null) {
+                Map<String, Integer> productQuantities = new HashMap<>();
+                for (OrderProduct orderProduct : order.getProducts()) {
+                    productQuantities.put(orderProduct.getProductId(), orderProduct.getQuantity());
+                }
+                stockPort.restoreStock(productQuantities);
+            }
+        }
+        
+        // Cambiar estado a cancelado
+        order.setStatus(OrderStatus.CANCELLED);
+        
+        // Guardar la orden actualizada
+        Order updatedOrder = orderPort.updateOrder(order);
+        
+        // Enviar email de cancelación
+        try {
+            sendCancellationEmail(updatedOrder);
+        } catch (Exception e) {
+            logger.warn("No se pudo enviar el email de cancelación para la orden: {}. Error: {}", 
+                       updatedOrder.getId(), e.getMessage());
+            // No fallar la cancelación si el email no se puede enviar
+        }
+        
+        return updatedOrder;
+    }
+    
+    private boolean canBeCancelled(OrderStatus status) {
+        // Una orden puede ser cancelada si está en estos estados
+        return status == OrderStatus.PROCESSING ||
+               status == OrderStatus.CONFIRMED ||
+               status == OrderStatus.PREPARING ||
+               status == OrderStatus.PAYMENT_FAILED ||
+               status == OrderStatus.EXPIRED;
+    }
+
+    private void sendCancellationEmail(Order order) {
+        try {
+            // Obtener información del usuario
+            Optional<User> userOpt = userRepository.findById(order.getUserId());
+            if (!userOpt.isPresent()) {
+                logger.warn("Usuario no encontrado para la orden {}: {}", order.getId(), order.getUserId());
+                return;
+            }
+
+            User user = userOpt.get();
+            Map<String, Object> variables = new HashMap<>();
+            variables.put("userName", user.getPerfil().getNames() + " " + user.getPerfil().getSurnames());
+            variables.put("orderId", order.getId());
+
+            EmailRequest emailRequest = new EmailRequest();
+            emailRequest.setTo(user.getEmail());
+            emailRequest.setSubject("Cancelación de Orden - " + order.getId() + " - Assemblies Store");
+            emailRequest.setTemplateName("order-cancellation");
+            emailRequest.setVariables(variables);
+
+            emailService.sendEmail(emailRequest);
+            
+            logger.info("Email de cancelación enviado exitosamente para la orden: {} al usuario: {}", 
+                       order.getId(), user.getEmail());
+        } catch (Exception e) {
+            logger.error("Error al enviar email de cancelación para la orden {}: {}", order.getId(), e.getMessage());
+            throw e;
         }
     }
 }
