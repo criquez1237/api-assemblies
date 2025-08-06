@@ -1,0 +1,15 @@
+meta {
+  name: cancel order
+  type: http
+  seq: 6
+}
+
+patch {
+  url: http://localhost:8081/api/orders/98eacec6-bd4f-4ede-9fce-efdf587f2b4b/cancel
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: eyJhbGciOiJIUzUxMiJ9.eyJqdGkiOiJmNDA1Zjg4NC0yMjY3LTRiZjQtODFhYi0wYTRjMjU4YjYwZmYiLCJ1c2VyTmFtZSI6ImVranJpY25yaXUiLCJzdWIiOiJ0ZXN0MTRqQGV4YW1wbGUuY29tIiwiaWF0IjoxNzUzMjE5MzY4LCJleHAiOjE3NTMzMDU3Njh9.9rIs5xKt5JEyqwnWSso43QLfLa33sQ6sMh9CNiTa0FlE9xaQq2YBg72QRogI_H5XBldAU_T2kkmk2cOpaEfC7A
+}

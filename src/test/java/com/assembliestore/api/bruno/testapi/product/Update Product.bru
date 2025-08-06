@@ -1,0 +1,100 @@
+meta {
+  name: Update Product
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/v1/products/upsert
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{adminToken}}
+}
+
+body:json {
+  {
+    "id": "{{productId}}",
+    "name": "iPhone 15 Pro Max - Actualizado",
+    "description": "El smartphone más avanzado de Apple con tecnología ProRAW, cámara triple y nuevas funciones IA",
+    "specifications": [
+      {
+        "id": "spec1",
+        "name": "Pantalla",
+        "value": "6.7 pulgadas Super Retina XDR con ProMotion",
+        "visible": true,
+        "actived": true,
+        "deleted": false,
+        "createdAt": "2025-01-21T10:00:00.000Z",
+        "updatedAt": "2025-01-21T10:00:00.000Z",
+        "deletedAt": null
+      },
+      {
+        "id": "spec2",
+        "name": "Procesador",
+        "value": "A17 Pro Bionic con Neural Engine",
+        "visible": true,
+        "actived": true,
+        "deleted": false,
+        "createdAt": "2025-01-21T10:00:00.000Z",
+        "updatedAt": "2025-01-21T10:00:00.000Z",
+        "deletedAt": null
+      },
+      {
+        "id": "spec3",
+        "name": "Almacenamiento",
+        "value": "256GB",
+        "visible": true,
+        "actived": true,
+        "deleted": false,
+        "createdAt": "2025-01-21T10:00:00.000Z",
+        "updatedAt": "2025-01-21T10:00:00.000Z",
+        "deletedAt": null
+      }
+    ],
+    "brandName": "Apple",
+    "price": 1399.99,
+    "gallery": [
+      {
+        "id": "img1",
+        "imageUrl": "https://example.com/iphone15pro-front-updated.jpg",
+        "description": "Vista frontal iPhone 15 Pro Max actualizada",
+        "visible": true,
+        "actived": true,
+        "deleted": false,
+        "createdAt": "2025-01-21T10:00:00.000Z",
+        "updatedAt": "2025-01-21T10:00:00.000Z",
+        "deletedAt": null
+      },
+      {
+        "id": "img2",
+        "imageUrl": "https://example.com/iphone15pro-back.jpg",
+        "description": "Vista trasera iPhone 15 Pro Max",
+        "visible": true,
+        "actived": true,
+        "deleted": false,
+        "createdAt": "2025-01-21T10:00:00.000Z",
+        "updatedAt": "2025-01-21T10:00:00.000Z",
+        "deletedAt": null
+      }
+    ],
+    "subCategoryId": "subcat123",
+    "stockQuantity": 75,
+    "actived": true,
+    "visible": true
+  }
+}
+
+tests {
+  test("Response status is 200", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+  
+  test("Response has success message for update", function() {
+    expect(res.getBody()).to.have.property('success');
+    expect(res.getBody().success).to.equal('true');
+    expect(res.getBody().message).to.contain('actualizado exitosamente');
+  });
+}

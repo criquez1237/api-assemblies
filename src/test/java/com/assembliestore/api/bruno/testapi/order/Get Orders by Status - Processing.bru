@@ -1,0 +1,34 @@
+meta {
+  name: Get Orders by Status - Processing
+  type: http
+  seq: 7
+}
+
+get {
+  url: http://localhost:8081/api/orders/status/Processing
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: eyJhbGciOiJIUzUxMiJ9.eyJqdGkiOiJmNDA1Zjg4NC0yMjY3LTRiZjQtODFhYi0wYTRjMjU4YjYwZmYiLCJ1c2VyTmFtZSI6ImVranJpY25yaXUiLCJzdWIiOiJ0ZXN0MTRqQGV4YW1wbGUuY29tIiwiaWF0IjoxNzUzMTk5ODA5LCJleHAiOjE3NTMyODYyMDl9.MClsPbgHrjq0s0DncJdiUFhtUofjLal7bdQKDosInGLwsf66NFttXy0nheGaxEUlbr6kV3ZeGLQ0m2ZeEAqlrw
+}
+
+tests {
+  test("Response status is 200 or 403", function() {
+    expect([200, 403]).to.include(res.getStatus());
+  });
+  
+  test("If authorized, response has orders with Processing status", function() {
+    if (res.getStatus() === 200) {
+      expect(res.getBody().success).to.equal(true);
+      expect(res.getBody().message).to.equal("Orders by status retrieved");
+      expect(res.getBody().data).to.be.an('array');
+      
+      const orders = res.getBody().data;
+      orders.forEach(order => {
+        expect(order.status).to.equal("Processing");
+      });
+    }
+  });
+}

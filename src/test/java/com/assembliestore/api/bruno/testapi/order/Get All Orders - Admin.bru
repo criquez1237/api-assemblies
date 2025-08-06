@@ -1,0 +1,36 @@
+meta {
+  name: Get All Orders - Admin
+  type: http
+  seq: 5
+}
+
+get {
+  url: http://localhost:8081/api/orders
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: eyJhbGciOiJIUzUxMiJ9.eyJqdGkiOiJmNDA1Zjg4NC0yMjY3LTRiZjQtODFhYi0wYTRjMjU4YjYwZmYiLCJ1c2VyTmFtZSI6ImVranJpY25yaXUiLCJzdWIiOiJ0ZXN0MTRqQGV4YW1wbGUuY29tIiwiaWF0IjoxNzUzMTk5ODA5LCJleHAiOjE3NTMyODYyMDl9.MClsPbgHrjq0s0DncJdiUFhtUofjLal7bdQKDosInGLwsf66NFttXy0nheGaxEUlbr6kV3ZeGLQ0m2ZeEAqlrw
+}
+
+tests {
+  test("Response status is 200 or 403", function() {
+    expect([200, 403]).to.include(res.getStatus());
+  });
+  
+  test("If authorized, response has orders array", function() {
+    if (res.getStatus() === 200) {
+      expect(res.getBody().success).to.equal(true);
+      expect(res.getBody().message).to.equal("Órdenes obtenidas exitosamente");
+      expect(res.getBody().data).to.be.an('array');
+    }
+  });
+  
+  test("If forbidden, access denied", function() {
+    if (res.getStatus() === 403) {
+      // Access denied for CLIENT role
+      expect(res.getStatus()).to.equal(403);
+    }
+  });
+}

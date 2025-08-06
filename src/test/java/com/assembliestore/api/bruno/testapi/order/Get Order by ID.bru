@@ -1,0 +1,38 @@
+meta {
+  name: Get Order by ID
+  type: http
+  seq: 3
+}
+
+get {
+  url: http://localhost:8081/api/orders/550e8400-e29b-41d4-a716-446655440000
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: eyJhbGciOiJIUzUxMiJ9.eyJqdGkiOiJmNDA1Zjg4NC0yMjY3LTRiZjQtODFhYi0wYTRjMjU4YjYwZmYiLCJ1c2VyTmFtZSI6ImVranJpY25yaXUiLCJzdWIiOiJ0ZXN0MTRqQGV4YW1wbGUuY29tIiwiaWF0IjoxNzUzMTk5ODA5LCJleHAiOjE3NTMyODYyMDl9.MClsPbgHrjq0s0DncJdiUFhtUofjLal7bdQKDosInGLwsf66NFttXy0nheGaxEUlbr6kV3ZeGLQ0m2ZeEAqlrw
+}
+
+tests {
+  test("Response status is 200 or 404", function() {
+    expect([200, 404]).to.include(res.getStatus());
+  });
+  
+  test("If found, response has order data", function() {
+    if (res.getStatus() === 200) {
+      expect(res.getBody().success).to.equal(true);
+      expect(res.getBody().data.id).to.be.a('string');
+      expect(res.getBody().data.userId).to.be.a('string');
+      expect(res.getBody().data.total).to.be.a('number');
+      expect(res.getBody().data.status).to.be.a('string');
+    }
+  });
+  
+  test("If not found, error message is present", function() {
+    if (res.getStatus() === 404) {
+      expect(res.getBody().success).to.equal(false);
+      expect(res.getBody().message).to.equal("Orden no encontrada");
+    }
+  });
+}

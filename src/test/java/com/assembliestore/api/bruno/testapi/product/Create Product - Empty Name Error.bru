@@ -1,0 +1,43 @@
+meta {
+  name: Create Product - Empty Name Error
+  type: http
+  seq: 11
+}
+
+post {
+  url: {{baseUrl}}/v1/products/upsert
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{adminToken}}
+}
+
+body:json {
+  {
+    "name": "",
+    "description": "Producto sin nombre",
+    "specifications": [],
+    "brandName": "Test Brand",
+    "price": 99.99,
+    "gallery": [],
+    "subCategoryId": "subcat123",
+    "stockQuantity": 1,
+    "actived": true,
+    "visible": true
+  }
+}
+
+tests {
+  test("Response status is 400 for empty name", function() {
+    expect(res.getStatus()).to.equal(400);
+  });
+  
+  test("Error message indicates name is required", function() {
+    expect(res.getBody()).to.have.property('success');
+    expect(res.getBody().success).to.equal('true');
+    expect(res.getBody().message).to.contain('Error');
+    expect(res.getBody().message).to.contain('nombre del producto es requerido');
+  });
+}

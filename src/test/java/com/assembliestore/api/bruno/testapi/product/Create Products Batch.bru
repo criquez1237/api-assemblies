@@ -1,0 +1,106 @@
+meta {
+  name: Create Products Batch
+  type: http
+  seq: 3
+}
+
+post {
+  url: http://localhost:8081/api/products/upsert/batch
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: eyJhbGciOiJIUzUxMiJ9.eyJqdGkiOiJjOTFmMGIxZS0zNmY1LTRmOWItYTE0YS0yZTVmZGUzZjNlZjUiLCJ1c2VyTmFtZSI6ImFsaWNlMDEiLCJzdWIiOiJhbGljZTAxQGV4YW1wbGUuY29tIiwiaWF0IjoxNzUzMTQ2MzI0LCJleHAiOjE3NTMyMzI3MjR9.2u3JFGxr3obdIXI-yMskDJ2LM9Z_r2sgjK8b2nAfxiZwH43f9wH1v1UY3GfQLxr-vIsdM0Rg_ySro2GLNYl_5w
+}
+
+body:json {
+  {
+    "products": [
+      {
+        "name": "Samsung 3",
+        "description": "Smartphone premium con S Pen y cámara de 200MP",
+        "specifications": [
+          {
+            "id": "spec1",
+            "name": "Pantalla",
+            "value": "6.8 pulgadas Dynamic AMOLED 2X",
+            "visible": true,
+            "actived": true,
+            "deleted": false,
+            "createdAt": "2025-01-21T10:00:00.000Z",
+            "updatedAt": "2025-01-21T10:00:00.000Z",
+            "deletedAt": null
+          }
+        ],
+        "brandName": "Samsung",
+        "price": 1199.99,
+        "gallery": [
+          {
+            "id": "img1",
+            "imageUrl": "https://example.com/galaxy-s24-ultra.jpg",
+            "description": "Samsung Galaxy S24 Ultra",
+            "visible": true,
+            "actived": true,
+            "deleted": false,
+            "createdAt": "2025-01-21T10:00:00.000Z",
+            "updatedAt": "2025-01-21T10:00:00.000Z",
+            "deletedAt": null
+          }
+        ],
+        "subCategoryId": "subcat456",
+        "stockQuantity": 30,
+        "actived": true,
+        "visible": true
+      },
+      {
+        "name": "Google Pixel e3eddo",
+        "description": "Smartphone con IA avanzada y cámara computacional",
+        "specifications": [
+          {
+            "id": "spec1",
+            "name": "Procesador",
+            "value": "Google Tensor G3",
+            "visible": true,
+            "actived": true,
+            "deleted": false,
+            "createdAt": "2025-01-21T10:00:00.000Z",
+            "updatedAt": "2025-01-21T10:00:00.000Z",
+            "deletedAt": null
+          }
+        ],
+        "brandName": "Google",
+        "price": 999.99,
+        "gallery": [
+          {
+            "id": "img1",
+            "imageUrl": "https://example.com/pixel-8-pro.jpg",
+            "description": "Google Pixel 8 Pro",
+            "visible": true,
+            "actived": true,
+            "deleted": false,
+            "createdAt": "2025-01-21T10:00:00.000Z",
+            "updatedAt": "2025-01-21T10:00:00.000Z",
+            "deletedAt": null
+          }
+        ],
+        "subCategoryId": "subcat789",
+        "stockQuantity": 25,
+        "actived": true,
+        "visible": true
+      }
+    ]
+  }
+}
+
+tests {
+  test("Response status is 200", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+  
+  test("Response has success message for batch", function() {
+    expect(res.getBody()).to.have.property('success');
+    expect(res.getBody().success).to.equal('true');
+    expect(res.getBody().message).to.contain('procesaron 2 productos exitosamente');
+  });
+}

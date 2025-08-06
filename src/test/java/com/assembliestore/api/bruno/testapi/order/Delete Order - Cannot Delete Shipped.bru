@@ -1,0 +1,26 @@
+meta {
+  name: Delete Order - Cannot Delete Shipped
+  type: http
+  seq: 13
+}
+
+delete {
+  url: http://localhost:8081/api/orders/shipped-order-id
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: eyJhbGciOiJIUzUxMiJ9.eyJqdGkiOiJmNDA1Zjg4NC0yMjY3LTRiZjQtODFhYi0wYTRjMjU4YjYwZmYiLCJ1c2VyTmFtZSI6ImVranJpY25yaXUiLCJzdWIiOiJ0ZXN0MTRqQGV4YW1wbGUuY29tIiwiaWF0IjoxNzUzMTk5ODA5LCJleHAiOjE3NTMyODYyMDl9.MClsPbgHrjq0s0DncJdiUFhtUofjLal7bdQKDosInGLwsf66NFttXy0nheGaxEUlbr6kV3ZeGLQ0m2ZeEAqlrw
+}
+
+tests {
+  test("Response status is 400", function() {
+    expect(res.getStatus()).to.equal(400);
+  });
+  
+  test("Cannot delete shipped or delivered orders", function() {
+    expect(res.getBody().success).to.equal(false);
+    expect(res.getBody().message).to.contain("Cannot delete an order that has already been shipped or delivered");
+  });
+}

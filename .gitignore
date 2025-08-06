@@ -61,3 +61,5 @@ test-output/
 coverage/
 jacoco.exec
 generated/
+
+serviceAccountKey.json

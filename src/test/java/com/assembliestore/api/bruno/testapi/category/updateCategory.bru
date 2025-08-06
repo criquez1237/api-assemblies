@@ -1,0 +1,27 @@
+meta {
+  name: updateCategory
+  type: http
+  seq: 2
+}
+
+put {
+  url: http://localhost:8081/api/categorie/update
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: eyJhbGciOiJIUzUxMiJ9.eyJqdGkiOiJjOTFmMGIxZS0zNmY1LTRmOWItYTE0YS0yZTVmZGUzZjNlZjUiLCJ1c2VyTmFtZSI6ImFsaWNlMDEiLCJzdWIiOiJhbGljZTAxQGV4YW1wbGUuY29tIiwiaWF0IjoxNzUzMDcwMjg5LCJleHAiOjE3NTMxNTY2ODl9.MS2J1ltrP0d6-VAdalDXxTi8TzArBPuBJR5LNytGou-b2weSb3vWYCzstRG65QLjhb8clPWKYCJSbUTpYXjeyw
+}
+
+body:json {
+  {
+    "id": "9dd97390-985a-4fbd-ae7a-624e0dde8280",
+    "name": "CategoriaActualizada",
+    "description": "Categoria actualizada de prueba",
+    "imageUrl": null,
+    "subCategory": null,
+    "actived": false,
+    "visible": false
+  }
+}

@@ -1,0 +1,41 @@
+meta {
+  name: Create Order - Unauthorized
+  type: http
+  seq: 16
+}
+
+post {
+  url: http://localhost:8081/api/orders
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "products": [
+      {
+        "productId": "prod123",
+        "name": "Test Product",
+        "unitPrice": 100.00,
+        "quantity": 1
+      }
+    ],
+    "shippingAddress": {
+      "street": "123 Test Street",
+      "city": "Test City",
+      "country": "Test Country",
+      "postalCode": "12345"
+    },
+    "paymentMethod": "CREDIT_CARD"
+  }
+}
+
+tests {
+  test("Response status is 401 or 403", function() {
+    expect([401, 403]).to.include(res.getStatus());
+  });
+  
+  test("Unauthorized access without token", function() {
+    expect([401, 403]).to.include(res.getStatus());
+  });
+}

@@ -1,0 +1,35 @@
+meta {
+  name: Update Order Status - Cancel
+  type: http
+  seq: 10
+}
+
+patch {
+  url: http://localhost:8081/api/orders/550e8400-e29b-41d4-a716-446655440000/status
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: eyJhbGciOiJIUzUxMiJ9.eyJqdGkiOiJmNDA1Zjg4NC0yMjY3LTRiZjQtODFhYi0wYTRjMjU4YjYwZmYiLCJ1c2VyTmFtZSI6ImVranJpY25yaXUiLCJzdWIiOiJ0ZXN0MTRqQGV4YW1wbGUuY29tIiwiaWF0IjoxNzUzMTk5ODA5LCJleHAiOjE3NTMyODYyMDl9.MClsPbgHrjq0s0DncJdiUFhtUofjLal7bdQKDosInGLwsf66NFttXy0nheGaxEUlbr6kV3ZeGLQ0m2ZeEAqlrw
+}
+
+body:json {
+  {
+    "status": "Cancelled"
+  }
+}
+
+tests {
+  test("Response status is 200 or 400 or 403", function() {
+    expect([200, 400, 403]).to.include(res.getStatus());
+  });
+  
+  test("If successful, order status is updated to Cancelled", function() {
+    if (res.getStatus() === 200) {
+      expect(res.getBody().success).to.equal(true);
+      expect(res.getBody().message).to.equal("Order status updated");
+      expect(res.getBody().data.status).to.equal("Cancelled");
+    }
+  });
+}

@@ -1,0 +1,38 @@
+meta {
+  name: Add Gallery Image
+  type: http
+  seq: 1
+}
+
+post {
+  url: http://localhost:8081/api/products/a791f32c-a6a5-45ad-b3d5-3b97e2bdbc81/gallery
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: eyJhbGciOiJIUzUxMiJ9.eyJqdGkiOiJjOTFmMGIxZS0zNmY1LTRmOWItYTE0YS0yZTVmZGUzZjNlZjUiLCJ1c2VyTmFtZSI6ImFsaWNlMDEiLCJzdWIiOiJhbGljZTAxQGV4YW1wbGUuY29tIiwiaWF0IjoxNzUzMTQ2MzI0LCJleHAiOjE3NTMyMzI3MjR9.2u3JFGxr3obdIXI-yMskDJ2LM9Z_r2sgjK8b2nAfxiZwH43f9wH1v1UY3GfQLxr-vIsdM0Rg_ySro2GLNYl_5w
+}
+
+body:json {
+  {
+    "id": "img2",
+    "imageUrl": "https://example.com/new-image.jpg",
+    "description": "Nueva imagen agregada",
+    "visible": true,
+    "actived": true,
+    "deleted": false,
+    "createdAt": "2025-07-21T10:00:00.000Z",
+    "updatedAt": "2025-07-21T10:00:00.000Z",
+    "deletedAt": null
+  }
+}
+
+tests {
+  test("Response status is 200", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+  test("Response has success message", function() {
+    expect(res.getBody().message).to.contain("Imagen agregada");
+  });
+}

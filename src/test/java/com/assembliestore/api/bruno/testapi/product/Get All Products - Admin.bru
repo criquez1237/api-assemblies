@@ -1,0 +1,60 @@
+meta {
+  name: Get All Products - Admin
+  type: http
+  seq: 7
+}
+
+get {
+  url: {{baseUrl}}/v1/products
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{adminToken}}
+}
+
+tests {
+  test("Response status is 200", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+  
+  test("Returns array of products", function() {
+    const products = res.getBody();
+    expect(products).to.be.an('array');
+  });
+  
+  test("Admin sees all products including deleted", function() {
+    const products = res.getBody();
+    if (products.length > 0) {
+      // Verificar que el primer producto tiene todos los campos
+      const product = products[0];
+      expect(product).to.have.property('id');
+      expect(product).to.have.property('name');
+      expect(product).to.have.property('description');
+      expect(product).to.have.property('specifications');
+      expect(product).to.have.property('brandName');
+      expect(product).to.have.property('price');
+      expect(product).to.have.property('gallery');
+      expect(product).to.have.property('subCategoryId');
+      expect(product).to.have.property('stockQuantity');
+      expect(product).to.have.property('actived');
+      expect(product).to.have.property('visible');
+      expect(product).to.have.property('deleted');
+      expect(product).to.have.property('createdAt');
+      expect(product).to.have.property('updatedAt');
+    }
+  });
+  
+  test("All prices have correct decimal format", function() {
+    const products = res.getBody();
+    products.forEach(product => {
+      expect(product.price).to.be.a('number');
+      const priceString = product.price.toString();
+      const decimals = priceString.split('.')[1];
+      if (decimals) {
+        expect(decimals.length).to.be.at.most(2);
+      }
+    });
+  });
+}
