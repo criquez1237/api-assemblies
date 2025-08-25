@@ -1,0 +1,11 @@
+# Ejemplo de configuración de OAuth2 Google
+# Renombra este archivo a application-local.yml y reemplaza con tus credenciales
+
+spring:
+    security:
+        oauth2:
+            client:
+                registration:
+                    google:
+                        client-id: tu-client-id-aqui
+                        client-secret: tu-client-secret-aqui

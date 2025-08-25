@@ -26,7 +26,7 @@ import com.assembliestore.api.module.user.domain.port.JwtPort;
 import com.assembliestore.api.module.user.domain.repository.TokenRepository;
 import com.assembliestore.api.module.user.domain.repository.UserRepository;
 import com.assembliestore.api.module.user.application.services.OTPService;
-import com.assembliestore.api.service.email.EmailService;
+import com.assembliestore.api.service.email.SmtpEmailService;
 import com.assembliestore.api.service.email.dto.EmailRequest;
 
 @Service
@@ -40,7 +40,7 @@ public class AuthService implements AuthPort {
     private final AuthenticationManager _authenticationManager;
     private final TokenRepository _tokenRepository;
     private final JwtPort _jwtPort;
-    private final EmailService _emailService;
+    private final SmtpEmailService _emailService;
     private final OTPService _otpService;
 
     public AuthService(
@@ -50,7 +50,7 @@ public class AuthService implements AuthPort {
             AuthenticationManager authenticationManager,
             JwtPort jwtPort,
             TokenRepository tokenRepository,
-            EmailService emailService,
+            SmtpEmailService emailService,
             OTPService otpService
             ) {
 
@@ -59,8 +59,8 @@ public class AuthService implements AuthPort {
         this._tokenService = tokenService;
         this._authenticationManager = authenticationManager;
         this._jwtPort = jwtPort;
-        this._tokenRepository = tokenRepository;
-        this._emailService = emailService;
+    this._tokenRepository = tokenRepository;
+    this._emailService = emailService;
         this._otpService = otpService;
     }
 
@@ -141,6 +141,7 @@ public class AuthService implements AuthPort {
         
         // Activar la cuenta
         user.setActived(true);
+        user.setVerified(true);
         _userRepository.update(user);
 
         // Generar tokens JWT

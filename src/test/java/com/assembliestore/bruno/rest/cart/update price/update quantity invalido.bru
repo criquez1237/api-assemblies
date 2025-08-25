@@ -1,0 +1,14 @@
+meta {
+  name: update quantity invalido
+  type: http
+  seq: 11
+}
+
+patch {
+  url: http://localhost:8081/api/cart/items/prod-123?quantity=-5
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+}

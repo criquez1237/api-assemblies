@@ -1,0 +1,19 @@
+meta {
+  name: get cart correcto
+  type: http
+  seq: 2
+}
+
+get {
+  url: http://localhost:8081/api/cart
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: eyJhbGciOiJIUzUxMiJ9.eyJqdGkiOiI3Y2IxYjMyYS1kMWQ1LTRjMTQtYmM4NS03NzAwZmIwNjQxMzgiLCJ1c2VyTmFtZSI6ImVranJpY25yaXUiLCJzdWIiOiJqdjAzOTAwMzIwMjBAdW5hYi5lZHUuc3YiLCJpYXQiOjE3NTYxNDM1NzgsImV4cCI6MTc1NjIyOTk3OH0.TC6jWuCwCsj2izLASkcYbKXGvUdbLrL7XwqdnEiTprBwrRzKWht_M8QOqWSVN5GGeGOHa8Pil6v_JrtWGipO6w
+}
+
+settings {
+  encodeUrl: true
+}

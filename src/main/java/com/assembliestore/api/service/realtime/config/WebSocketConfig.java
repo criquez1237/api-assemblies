@@ -18,14 +18,14 @@ public class WebSocketConfig implements WebSocketConfigurer {
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
         // Endpoint para stock updates (solo MANAGEMENT)
         registry.addHandler(webSocketHandler, "/ws/stock")
-                .setAllowedOriginPatterns("*"); // Cambiado para compatibilidad con allowCredentials
+                .setAllowedOrigins("*"); // En producción, especifica dominios permitidos
 
         // Endpoint para notificaciones generales (CLIENT, ADMIN, MANAGEMENT)
         registry.addHandler(webSocketHandler, "/ws/notifications")
-                .setAllowedOriginPatterns("*"); // Cambiado para compatibilidad con allowCredentials
+                .setAllowedOrigins("*"); // En producción, especifica dominios permitidos
 
         // Endpoint general para cualquier tipo de comunicación
         registry.addHandler(webSocketHandler, "/ws/general")
-                .setAllowedOriginPatterns("*"); // Cambiado para compatibilidad con allowCredentials
+                .setAllowedOrigins("*"); // En producción, especifica dominios permitidos
     }
 }

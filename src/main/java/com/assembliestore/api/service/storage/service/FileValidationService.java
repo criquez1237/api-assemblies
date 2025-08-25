@@ -22,10 +22,9 @@ public class FileValidationService {
         Pattern.CASE_INSENSITIVE
     );
     
-    // Patrones para extensiones dobles sospechosas
-    private static final Pattern DOUBLE_EXTENSION_PATTERN = Pattern.compile(
-        ".*\\.(exe|bat|cmd|com|pif|scr|vbs|js|jar|sh|ps1)\\.(jpg|jpeg|png|gif|pdf|doc|docx|xls|xlsx|txt)$",
-        Pattern.CASE_INSENSITIVE
+    // Lista de extensiones peligrosas para comprobar extensiones dobles
+    private static final java.util.Set<String> DANGEROUS_EXTENSIONS = java.util.Set.of(
+        "exe","bat","cmd","com","pif","scr","vbs","js","jar","sh","ps1","psm1","reg","msi","dll","bin","iso","img"
     );
 
     // Caracteres peligrosos en nombres de archivo
@@ -135,17 +134,25 @@ public class FileValidationService {
      * Detectar extensiones dobles sospechosas (ej: malware.pdf.exe)
      */
     private FileValidationResult validateDoubleExtension(String fileName) {
-        if (DOUBLE_EXTENSION_PATTERN.matcher(fileName).matches()) {
-            return FileValidationResult.error(
-                "Detectada posible extensión doble maliciosa. Archivo rechazado por seguridad: " + fileName
-            );
+        // Split by dots and inspect last two extensions (penult + last)
+        String[] parts = fileName.split("\\.");
+
+        if (parts.length >= 3) {
+            String penultExt = parts[parts.length - 2].toLowerCase();
+
+            // Rechazar cuando la penúltima extensión sea de las peligrosas
+            if (DANGEROUS_EXTENSIONS.contains(penultExt)) {
+                return FileValidationResult.error(
+                    "Detectada posible extensión doble maliciosa (.." + penultExt + "). Archivo rechazado: " + fileName
+                );
+            }
         }
 
-        // Contar puntos para detectar múltiples extensiones
+        // Contar puntos para detectar múltiples extensiones excesivas
         long dotCount = fileName.chars().filter(ch -> ch == '.').count();
-        if (dotCount > 3) { // Permitir hasta 3 puntos (ej: archivo.backup.2023.pdf)
+        if (dotCount > 2) { // Permitir hasta 2 puntos (nombre.base.ext o nombre.ext)
             return FileValidationResult.error(
-                "Demasiadas extensiones en el nombre del archivo: " + fileName
+                "Nombre de archivo sospechoso con múltiples puntos: " + fileName
             );
         }
 

@@ -1,0 +1,26 @@
+meta {
+  name: add sin auth
+  type: http
+  seq: 10
+}
+
+post {
+  url: http://localhost:8081/api/cart/items
+  body: json
+  # intentionally no auth header to trigger error
+}
+
+body:json {
+  {
+    "productId": "prod-noauth",
+    "name": "Producto sin auth",
+    "unitPrice": 9.99,
+    "description": "Sin auth",
+    "gallery": [],
+    "quantity": 1
+  }
+}
+
+settings {
+  encodeUrl: true
+}

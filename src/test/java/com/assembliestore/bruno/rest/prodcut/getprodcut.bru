@@ -1,0 +1,24 @@
+meta {
+  name: getprodcut
+  type: http
+  seq: 2
+}
+
+get {
+  url: http://localhost:8081/api/products?page=1&limit=10
+  body: json
+  auth: bearer
+}
+
+params:query {
+  page: 1
+  limit: 10
+}
+
+auth:bearer {
+  token: eyJhbGciOiJIUzUxMiJ9.eyJqdGkiOiI3Y2IxYjMyYS1kMWQ1LTRjMTQtYmM4NS03NzAwZmIwNjQxMzgiLCJ1c2VyTmFtZSI6ImVranJpY25yaXUiLCJzdWIiOiJqdjAzOTAwMzIwMjBAdW5hYi5lZHUuc3YiLCJpYXQiOjE3NTYxNTE4NDEsImV4cCI6MTc1NjIzODI0MX0.YK8xQJ9T4GCdwHDaP6K7QH5x0HkhSkPqOnqpdnCatWFtQ7iTkVkQhRzD176nF4PeTOHi2miIqTksT5m3y93XJQ
+}
+
+settings {
+  encodeUrl: true
+}

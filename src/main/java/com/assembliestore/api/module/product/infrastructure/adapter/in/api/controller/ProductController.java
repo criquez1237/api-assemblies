@@ -18,6 +18,13 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import jakarta.servlet.http.HttpServletRequest;
+import com.assembliestore.api.common.response.ApiErrorResponse;
+import com.assembliestore.api.common.response.ApiSuccessResponse;
+import com.assembliestore.api.common.response.ErrorDetail;
+import com.assembliestore.api.common.response.ResponseUtil;
+import com.assembliestore.api.common.response.TechnicalDetails;
+import com.assembliestore.api.config.AppEnvConfig;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -35,10 +42,12 @@ public class ProductController {
 
     private final ProductPort productPort;
     private final ProductMapper productMapper;
+    private final AppEnvConfig appEnvConfig;
 
-    public ProductController(ProductPort productPort, ProductMapper productMapper) {
+    public ProductController(ProductPort productPort, ProductMapper productMapper, AppEnvConfig appEnvConfig) {
         this.productPort = productPort;
         this.productMapper = productMapper;
+        this.appEnvConfig = appEnvConfig;
     }
 
     /**
@@ -132,46 +141,98 @@ public class ProductController {
         @ApiResponse(responseCode = "401", description = "No autorizado")
     })
     @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGEMENT') or hasRole('CLIENT')")
-    public ResponseEntity<?> getProductById(@PathVariable String id) {
+    public ResponseEntity<?> getProductById(@PathVariable String id, HttpServletRequest request) {
+        long start = System.currentTimeMillis();
         try {
             String userRole = getUserRole();
             Optional<Product> product = productPort.findProductById(id, userRole);
-            
+
             if (product.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new SuccessfulResponse("Producto no encontrado"));
+                TechnicalDetails tech = ResponseUtil.buildTechnicalDetails(request, System.currentTimeMillis() - start, appEnvConfig);
+                ApiErrorResponse error = new ApiErrorResponse("Producto no encontrado", "PRODUCT_NOT_FOUND",
+                        java.util.Arrays.asList(new ErrorDetail("product", "not_found")), tech);
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
             }
-            
+
             ProductResponseDto productDto = productMapper.toDto(product.get());
-            return ResponseEntity.ok(productDto);
-            
+            TechnicalDetails tech = ResponseUtil.buildTechnicalDetails(request, System.currentTimeMillis() - start, appEnvConfig);
+            ApiSuccessResponse<ProductResponseDto> resp = new ApiSuccessResponse<>("Producto obtenido", "PRODUCT_GET_SUCCESS", productDto, tech);
+            return ResponseEntity.ok(resp);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(new SuccessfulResponse("Error: " + e.getMessage()));
+            TechnicalDetails tech = ResponseUtil.buildTechnicalDetails(request, System.currentTimeMillis() - start, appEnvConfig);
+            ApiErrorResponse error = new ApiErrorResponse("Error obteniendo producto", "PRODUCT_GET_ERROR",
+                    java.util.Arrays.asList(new ErrorDetail("product", e.getMessage())), tech);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
         }
     }
 
-    @GetMapping
+    @GetMapping()
     @Operation(summary = "Obtener todos los productos", description = "Retorna productos filtrados según el rol del usuario autenticado")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Lista de productos obtenida"),
         @ApiResponse(responseCode = "401", description = "No autorizado")
     })
     @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGEMENT') or hasRole('CLIENT')")
-    public ResponseEntity<?> getAllProducts() {
+    public ResponseEntity<?> getAllProducts(HttpServletRequest request,
+                                            @RequestParam(name = "page", required = false) Integer page,
+                                            @RequestParam(name = "limit", required = false) Integer limit,
+                                            @RequestParam(name = "name", required = false) String name,
+                                            @RequestParam(name = "minPrice", required = false) java.math.BigDecimal minPrice,
+                                            @RequestParam(name = "maxPrice", required = false) java.math.BigDecimal maxPrice) {
+        long start = System.currentTimeMillis();
         try {
             String userRole = getUserRole();
             List<Product> products = productPort.findAllProducts(userRole);
-            
-            List<ProductResponseDto> productDtos = products.stream()
-                .map(productMapper::toDto)
-                .collect(Collectors.toList());
-                
-            return ResponseEntity.ok(productDtos);
-                
+
+            List<Product> filtered = new java.util.ArrayList<>();
+            for (Product p : products) {
+                boolean keep = true;
+                if (name != null && !name.isBlank()) {
+                    String nm = p.getName() == null ? "" : p.getName();
+                    if (!nm.toLowerCase().contains(name.toLowerCase())) keep = false;
+                }
+                if (keep && minPrice != null) {
+                    if (p.getPrice() == null || java.math.BigDecimal.valueOf(p.getPrice()).compareTo(minPrice) < 0) keep = false;
+                }
+                if (keep && maxPrice != null) {
+                    if (p.getPrice() == null || java.math.BigDecimal.valueOf(p.getPrice()).compareTo(maxPrice) > 0) keep = false;
+                }
+                if (keep) filtered.add(p);
+            }
+
+            int p = (page == null || page < 1) ? 1 : page;
+            int l = (limit == null || limit < 1) ? 10 : limit;
+
+            int totalItems = filtered.size();
+            int totalPages = (int) Math.ceil((double) totalItems / l);
+            if (totalPages == 0) totalPages = 1;
+            int currentPage = Math.min(p, totalPages);
+            int fromIndex = (currentPage - 1) * l;
+            int toIndex = Math.min(fromIndex + l, totalItems);
+
+            List<ProductResponseDto> pageDtos = new java.util.ArrayList<>();
+            if (fromIndex < toIndex) {
+                pageDtos = filtered.subList(fromIndex, toIndex).stream().map(productMapper::toDto).collect(Collectors.toList());
+            }
+
+            com.assembliestore.api.module.cart.infrastructure.adapter.dto.PaginationDto pagination = new com.assembliestore.api.module.cart.infrastructure.adapter.dto.PaginationDto(
+                    totalItems, totalPages, currentPage, currentPage < totalPages, currentPage > 1, l
+            );
+
+            java.util.Map<String,Object> data = java.util.Map.of(
+                    "items", pageDtos,
+                    "pagination", pagination
+            );
+
+            TechnicalDetails tech = ResponseUtil.buildTechnicalDetails(request, System.currentTimeMillis() - start, appEnvConfig);
+            ApiSuccessResponse<java.util.Map<String,Object>> resp = new ApiSuccessResponse<>("Productos obtenidos", "PRODUCT_LIST_SUCCESS", data, tech);
+            return ResponseEntity.ok(resp);
+
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(new SuccessfulResponse("Error: " + e.getMessage()));
+            TechnicalDetails tech = ResponseUtil.buildTechnicalDetails(request, System.currentTimeMillis() - start, appEnvConfig);
+            ApiErrorResponse error = new ApiErrorResponse("Error obteniendo productos", "PRODUCT_LIST_ERROR",
+                    java.util.Arrays.asList(new ErrorDetail("products", e.getMessage())), tech);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
         }
     }
 

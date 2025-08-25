@@ -94,6 +94,15 @@
 			<version>0.12.6</version>
 			<scope>runtime</scope>
 		</dependency>
+
+		<!--
+		https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-oauth2-client -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-oauth2-client</artifactId>
+			<version>3.5.4</version>
+		</dependency>
+
 		<!--
 		https://mvnrepository.com/artifact/com.google.firebase/firebase-admin -->
 		<dependency>
@@ -129,17 +138,30 @@
 			<artifactId>jackson-datatype-jsr310</artifactId>
 		</dependency>
 
+
 		<dependency>
 			<groupId>com.resend</groupId>
 			<artifactId>resend-java</artifactId>
 			<version>3.1.0</version>
 		</dependency>
-
 		<!-- Cloudinary for file upload and management -->
 		<dependency>
 			<groupId>com.cloudinary</groupId>
 			<artifactId>cloudinary-http44</artifactId>
 			<version>1.34.0</version>
+		</dependency>
+
+		<!-- Spring Mail (JavaMailSender) for SMTP email support -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-mail</artifactId>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/jakarta.mail/jakarta.mail-api -->
+		<dependency>
+			<groupId>jakarta.mail</groupId>
+			<artifactId>jakarta.mail-api</artifactId>
+			<version>2.1.3</version>
 		</dependency>
 
 		<!-- Apache Tika for MIME type detection and file validation -->

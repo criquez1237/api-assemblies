@@ -246,10 +246,11 @@ public class CloudinaryService {
         }
         
         // Remover caracteres peligrosos y limitaciones de Cloudinary
-        return folder.replaceAll("[^a-zA-Z0-9/_-]", "_")
-                    .replaceAll("_{2,}", "_")
-                    .toLowerCase()
-                    .substring(0, Math.min(folder.length(), 50));
+    String sanitized = folder.replaceAll("[^a-zA-Z0-9/_-]", "_")
+                .replaceAll("_{2,}", "_")
+                .toLowerCase();
+
+    return sanitized.substring(0, Math.min(sanitized.length(), 50));
     }
 
     /**

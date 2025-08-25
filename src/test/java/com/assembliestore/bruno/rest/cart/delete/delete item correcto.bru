@@ -1,0 +1,19 @@
+meta {
+  name: delete item correcto
+  type: http
+  seq: 3
+}
+
+delete {
+  url: http://localhost:8081/api/cart/items/prod-123
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: eyJhbGciOiJIUzUxMiJ9.eyJqdGkiOiI3Y2IxYjMyYS1kMWQ1LTRjMTQtYmM4NS03NzAwZmIwNjQxMzgiLCJ1c2VyTmFtZSI6ImVranJpY25yaXUiLCJzdWIiOiJqdjAzOTAwMzIwMjBAdW5hYi5lZHUuc3YiLCJpYXQiOjE3NTYwODY3NTUsImV4cCI6MTc1NjE3MzE1NX0.wx6U_nFzkspSERgzikyc1Ck_R9ebtwgWry3jdVJfUxFc7x7iLX511ySt1ume45IS8pIKm5UXtHNrDlza_jlxMg
+}
+
+settings {
+  encodeUrl: true
+}

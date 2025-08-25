@@ -1,0 +1,22 @@
+meta {
+  name: verify-otp correcto
+  type: http
+  seq: 1
+}
+
+post {
+  url: http://localhost:8081/api/auth/verify-otp
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "email": "ha0372032020@unab.edu.sv",
+    "otpCode": "495964"
+  }
+}
+
+settings {
+  encodeUrl: true
+}

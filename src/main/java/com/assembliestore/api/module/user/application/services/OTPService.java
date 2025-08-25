@@ -2,7 +2,7 @@ package com.assembliestore.api.module.user.application.services;
 
 import com.assembliestore.api.module.user.domain.entities.OTPVerification;
 import com.assembliestore.api.module.user.domain.repository.OTPRepository;
-import com.assembliestore.api.service.email.EmailService;
+import com.assembliestore.api.service.email.SmtpEmailService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +22,7 @@ public class OTPService {
     private OTPRepository otpRepository;
 
     @Autowired
-    private EmailService emailService;
+    private SmtpEmailService emailService;
 
     /**
      * Generar y enviar código OTP
